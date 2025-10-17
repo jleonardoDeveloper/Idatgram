@@ -345,7 +345,7 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.m
 
 ## 👥 Autores
 
-- **Tu Nombre** - *Desarrollo inicial* - [@tu-usuario](https://github.com/tu-usuario)
+- **Julio Leonardo** - *Desarrollo inicial* - [@jleonardoDeveloper](https://github.com/jleonardoDeveloper)
 
 ## 🙏 Agradecimientos
 
@@ -356,9 +356,9 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.m
 
 ## 📞 Soporte
 
-- **Issues**: [GitHub Issues](https://github.com/tu-usuario/idatgram/issues)
-- **Documentación**: [Wiki del proyecto](https://github.com/tu-usuario/idatgram/wiki)
-- **Email**: tu-email@ejemplo.com
+- **Issues**: [GitHub Issues](https://github.com/jleonardoDeveloper/idatgram/issues)
+- **Documentación**: [Wiki del proyecto](https://github.com/jleonardoDeveloper/idatgram/wiki)
+- **Email**: julio.leonardo.developer@gmail.com
 
 ---
 
