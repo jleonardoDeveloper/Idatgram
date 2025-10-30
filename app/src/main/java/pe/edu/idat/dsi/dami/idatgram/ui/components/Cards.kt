@@ -481,3 +481,87 @@ private fun UserCardPreview() {
         )
     }
 }
+
+/**
+ * Componente para mostrar stories circulares
+ */
+@Composable
+fun StoryCircle(
+    imageUrl: String,
+    username: String,
+    hasNewStory: Boolean = false,
+    isOwnStory: Boolean = false,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.width(80.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box {
+            UserAvatar(
+                imageUrl = imageUrl,
+                size = 64.dp,
+                hasStory = hasNewStory,
+                onClick = onClick
+            )
+            
+            if (isOwnStory) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .size(20.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = CircleShape
+                        )
+                        .border(
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Agregar historia",
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(12.dp)
+                    )
+                }
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(4.dp))
+        
+        Text(
+            text = username,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun StoryCirclePreview() {
+    IdatgramTheme {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            StoryCircle(
+                imageUrl = "https://picsum.photos/100/100?random=1",
+                username = "Tu historia",
+                isOwnStory = true,
+                onClick = {}
+            )
+            StoryCircle(
+                imageUrl = "https://picsum.photos/100/100?random=2",
+                username = "john_doe",
+                hasNewStory = true,
+                onClick = {}
+            )
+        }
+    }
+}

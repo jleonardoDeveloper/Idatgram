@@ -4,6 +4,7 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import pe.edu.idat.dsi.dami.idatgram.data.database.DatabaseSeeder
 import pe.edu.idat.dsi.dami.idatgram.data.database.IdatgramDatabase
@@ -35,11 +36,11 @@ class IdatgramApplication : Application() {
      */
     private suspend fun initializeDatabase() {
         try {
-            // Verificar si ya hay datos
-            val userCount = database.userDao().getAllUsers()
+            // Verificar si ya hay usuarios
+            val users = database.userDao().getAllUsers().first()
             
             // Si no hay usuarios, insertar datos de ejemplo
-            if (userCount.toString().isEmpty()) { // Simplificación temporal
+            if (users.isEmpty()) {
                 DatabaseSeeder.seedDatabase(database)
             }
         } catch (e: Exception) {
