@@ -12,6 +12,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import pe.edu.idat.dsi.dami.idatgram.ui.screens.home.HomeScreen
+import pe.edu.idat.dsi.dami.idatgram.ui.screens.addpost.AddPostScreen
 
 /**
  * Navigation Graph principal de Idatgram
@@ -50,10 +52,19 @@ fun IdatgramNavGraph(
         // Pantallas Principales
         
         composable(route = IdatgramRoutes.HOME) {
-            // TODO: Implementar HomeScreen
-            PlaceholderScreen(
-                title = "Inicio",
-                subtitle = "Feed de publicaciones y stories"
+            HomeScreen(
+                onUserProfileClick = { userId ->
+                    navController.navigate("${IdatgramRoutes.USER_PROFILE}/$userId")
+                },
+                onStoryClick = { userId ->
+                    navController.navigate("${IdatgramRoutes.STORY_VIEWER}/$userId")
+                },
+                onCameraClick = {
+                    navController.navigate(IdatgramRoutes.ADD_POST)
+                },
+                onDirectMessagesClick = {
+                    // TODO: Implementar mensajes directos
+                }
             )
         }
         
@@ -66,11 +77,15 @@ fun IdatgramNavGraph(
         }
         
         composable(route = IdatgramRoutes.ADD_POST) {
-            // TODO: Implementar AddPostScreen
-            PlaceholderScreen(
-                title = "Nueva Publicación",
-                subtitle = "Crear y compartir contenido",
-                onNavigate = { navController.navigate(IdatgramRoutes.HOME) }
+            AddPostScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onPostCreated = {
+                    navController.navigate(IdatgramRoutes.HOME) {
+                        popUpTo(IdatgramRoutes.HOME) { inclusive = true }
+                    }
+                }
             )
         }
         

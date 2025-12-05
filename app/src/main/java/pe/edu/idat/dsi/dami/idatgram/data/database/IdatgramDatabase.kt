@@ -13,15 +13,15 @@ import pe.edu.idat.dsi.dami.idatgram.data.dao.UserDao
 import pe.edu.idat.dsi.dami.idatgram.data.entity.*
 
 /**
- * Base de datos principal de la aplicación Instagram Clone
+ * Base de datos de la aplicación Idatgram
  * 
  * Incluye todas las entidades y DAOs necesarios para:
- * - Gestión de usuarios y seguimientos
+ * - Gestión de usuarios y followers
  * - Posts con likes y guardados
  * - Comentarios con respuestas
  * - Stories con visualizaciones
  * 
- * Configurada con migraciones automáticas y datos de ejemplo para desarrollo
+ * Configurada con migraciones automáticas y datos de ejemplo para pruebas
  */
 @Database(
     entities = [
@@ -39,8 +39,6 @@ import pe.edu.idat.dsi.dami.idatgram.data.entity.*
     exportSchema = false
 )
 abstract class IdatgramDatabase : RoomDatabase() {
-    
-    // DAOs abstractos
     abstract fun userDao(): UserDao
     abstract fun postDao(): PostDao
     abstract fun commentDao(): CommentDao
@@ -64,20 +62,14 @@ abstract class IdatgramDatabase : RoomDatabase() {
                 instance
             }
         }
-        
-        /**
-         * Callback para inicializar la base de datos con datos de ejemplo
-         */
-        private class DatabaseCallback : RoomDatabase.Callback() {
+
+        private class DatabaseCallback : Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
                 // Los datos de ejemplo se insertarán via Repository en la primera ejecución
             }
         }
-        
-        /**
-         * Migraciones de la base de datos para futuras versiones
-         */
+
         private fun getAllMigrations(): Array<Migration> {
             return arrayOf(
                 // Ejemplo de migración para versión futura
@@ -85,7 +77,7 @@ abstract class IdatgramDatabase : RoomDatabase() {
                 // MIGRATION_2_3,
             )
         }
-        
+
         // Ejemplo de migración para versiones futuras
         /*
         private val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -98,22 +90,34 @@ abstract class IdatgramDatabase : RoomDatabase() {
     }
 }
 
-/**
- * Clase auxiliar para datos de ejemplo y semillas
- */
 object DatabaseSeeder {
-    
-    /**
-     * Crea usuarios de ejemplo para desarrollo y testing
-     */
-    suspend fun seedUsers(userDao: UserDao) {
+    suspend fun seedDatabase(database: IdatgramDatabase) {
+
+        seedUsers(database.userDao())
+
+        seedPosts(database.postDao())
+
+        seedFollows(database.userDao())
+    }
+    private suspend fun seedUsers(userDao: UserDao) {
         val sampleUsers = listOf(
             User(
+                id = "current_user",
+                username = "mi_usuario",
+                email = "yo@idatgram.com",
+                displayName = "Mi Perfil",
+                bio = "Estudiante de desarrollo móvil 📱💻",
+                profileImageUrl = "https://picsum.photos/200/200?random=0",
+                followersCount = 25,
+                followingCount = 89,
+                postsCount = 3
+            ),
+            User(
                 id = "user_1",
-                username = "john_doe",
-                email = "john@example.com",
-                displayName = "John Doe",
-                bio = "Photographer & Travel enthusiast 📸✈️",
+                username = "ana_garcia",
+                email = "ana@example.com",
+                displayName = "Ana García",
+                bio = "Fotógrafa profesional 📸✨",
                 profileImageUrl = "https://picsum.photos/200/200?random=1",
                 followersCount = 1250,
                 followingCount = 320,
@@ -122,10 +126,10 @@ object DatabaseSeeder {
             ),
             User(
                 id = "user_2",
-                username = "jane_smith",
-                email = "jane@example.com",
-                displayName = "Jane Smith",
-                bio = "Digital Artist | Coffee lover ☕🎨",
+                username = "carlos_mendez",
+                email = "carlos@example.com",
+                displayName = "Carlos Méndez",
+                bio = "Chef & Food blogger 🍽️👨‍�",
                 profileImageUrl = "https://picsum.photos/200/200?random=2",
                 followersCount = 890,
                 followingCount = 150,
@@ -133,10 +137,10 @@ object DatabaseSeeder {
             ),
             User(
                 id = "user_3",
-                username = "mike_wilson",
-                email = "mike@example.com",
-                displayName = "Mike Wilson",
-                bio = "Fitness coach & lifestyle blogger 💪",
+                username = "sofia_lopez",
+                email = "sofia@example.com",
+                displayName = "Sofía López",
+                bio = "Fitness trainer & wellness coach 💪✨",
                 profileImageUrl = "https://picsum.photos/200/200?random=3",
                 followersCount = 2100,
                 followingCount = 89,
@@ -144,129 +148,101 @@ object DatabaseSeeder {
                 isVerified = true
             ),
             User(
-                id = "current_user",
-                username = "me",
-                email = "me@example.com",
-                displayName = "Mi Perfil",
-                bio = "¡Hola! Soy nuevo en Instagram 👋",
-                profileImageUrl = "https://picsum.photos/200/200?random=999",
-                followersCount = 5,
-                followingCount = 12,
-                postsCount = 3
+                id = "user_4",
+                username = "diego_ruiz",
+                email = "diego@example.com",
+                displayName = "Diego Ruiz",
+                bio = "Viajero & aventurero 🌍⛰️",
+                profileImageUrl = "https://picsum.photos/200/200?random=4",
+                followersCount = 567,
+                followingCount = 234,
+                postsCount = 89
             )
         )
         
-        userDao.insertUsers(sampleUsers)
+        sampleUsers.forEach { user ->
+            userDao.insertUser(user)
+        }
+    }
+
+    private suspend fun seedPosts(postDao: PostDao) {
+        val samplePosts = listOf(
+            Post(
+                id = "post_1",
+                userId = "user_1",
+                caption = "Atardecer mágico en la playa 🌅 No hay nada como la belleza natural para inspirar nuevas ideas. #fotografía #naturaleza #atardecer",
+                imageUrl = "https://picsum.photos/800/800?random=101",
+                likesCount = 234,
+                commentsCount = 12,
+                location = "Playa Miraflores, Lima"
+            ),
+            Post(
+                id = "post_2",
+                userId = "user_2",
+                caption = "Mi nueva receta de pasta con mariscos 🍝🦐 ¡Perfecta para una cena especial! #chef #cocina #pasta #mariscos",
+                imageUrl = "https://picsum.photos/800/800?random=102",
+                likesCount = 189,
+                commentsCount = 24,
+                location = "Mi Cocina"
+            ),
+            Post(
+                id = "post_3",
+                userId = "user_3",
+                caption = "Entrenamiento matutino terminado ✅ ¡Empezar el día con energía es la clave del éxito! 💪 #fitness #training #motivation",
+                imageUrl = "https://picsum.photos/800/800?random=103",
+                likesCount = 445,
+                commentsCount = 31,
+                location = "Gym PowerFit"
+            ),
+            Post(
+                id = "post_4",
+                userId = "user_4",
+                caption = "Machu Picchu al amanecer 🏔️ Una experiencia que marca la vida. Perú, eres increíble! #travel #machupicchu #peru #aventura",
+                imageUrl = "https://picsum.photos/800/800?random=104",
+                likesCount = 678,
+                commentsCount = 45,
+                location = "Machu Picchu, Cusco"
+            ),
+            Post(
+                id = "post_5",
+                userId = "user_1",
+                caption = "Detalles que importan ✨ La fotografía macro nos revela un mundo invisible a simple vista #macro #photography #art",
+                imageUrl = "https://picsum.photos/800/800?random=105",
+                likesCount = 156,
+                commentsCount = 8,
+                location = "Estudio Fotográfico"
+            ),
+            Post(
+                id = "post_6",
+                userId = "user_2",
+                caption = "Brunch dominical 🥞🥓 Nada mejor que empezar el fin de semana con buena comida y mejor compañía #brunch #sunday #foodie",
+                imageUrl = "https://picsum.photos/800/800?random=106",
+                likesCount = 267,
+                commentsCount = 19,
+                location = "Café Central"
+            )
+        )
         
-        // Crear algunas relaciones de seguimiento
+        samplePosts.forEach { post ->
+            postDao.insertPost(post)
+        }
+    }
+
+    private suspend fun seedFollows(userDao: UserDao) {
         val follows = listOf(
             UserFollow("current_user", "user_1"),
             UserFollow("current_user", "user_2"),
             UserFollow("current_user", "user_3"),
             UserFollow("user_1", "current_user"),
-            UserFollow("user_2", "user_1"),
-            UserFollow("user_3", "user_2")
+            UserFollow("user_2", "current_user"),
+            UserFollow("user_1", "user_3"),
+            UserFollow("user_3", "user_1"),
+            UserFollow("user_2", "user_4"),
+            UserFollow("user_4", "user_2")
         )
         
-        follows.forEach { userDao.followUser(it) }
-    }
-    
-    /**
-     * Crea posts de ejemplo para desarrollo
-     */
-    suspend fun seedPosts(postDao: PostDao) {
-        val samplePosts = listOf(
-            Post(
-                id = "post_1",
-                userId = "user_1",
-                caption = "Beautiful sunset at the beach 🌅 #photography #sunset #beach",
-                imageUrl = "https://picsum.photos/400/400?random=101",
-                likesCount = 245,
-                commentsCount = 12,
-                location = "Malibu Beach, CA"
-            ),
-            Post(
-                id = "post_2",
-                userId = "user_2",
-                caption = "My latest digital artwork! What do you think? 🎨✨",
-                imageUrl = "https://picsum.photos/400/400?random=102",
-                likesCount = 189,
-                commentsCount = 8
-            ),
-            Post(
-                id = "post_3",
-                userId = "user_3",
-                caption = "Morning workout complete! 💪 Remember, consistency is key #fitness #motivation",
-                imageUrl = "https://picsum.photos/400/400?random=103",
-                likesCount = 312,
-                commentsCount = 25,
-                location = "Gold's Gym"
-            ),
-            Post(
-                id = "post_4",
-                userId = "current_user",
-                caption = "First post! Excited to be here 🎉",
-                imageUrl = "https://picsum.photos/400/400?random=104",
-                likesCount = 8,
-                commentsCount = 3
-            )
-        )
-        
-        postDao.insertPosts(samplePosts)
-        
-        // Algunos likes de ejemplo
-        val likes = listOf(
-            PostLike("post_1", "current_user"),
-            PostLike("post_2", "current_user"),
-            PostLike("post_4", "user_1"),
-            PostLike("post_4", "user_2")
-        )
-        
-        likes.forEach { postDao.likePost(it) }
-    }
-    
-    /**
-     * Crea stories de ejemplo para desarrollo
-     */
-    suspend fun seedStories(storyDao: StoryDao) {
-        val currentTime = System.currentTimeMillis()
-        val sampleStories = listOf(
-            Story(
-                id = "story_1",
-                userId = "user_1",
-                imageUrl = "https://picsum.photos/300/500?random=201",
-                text = "Good morning! ☀️",
-                viewsCount = 89,
-                expiresAt = currentTime + (20 * 60 * 60 * 1000) // Expira en 20 horas
-            ),
-            Story(
-                id = "story_2",
-                userId = "user_2",
-                imageUrl = "https://picsum.photos/300/500?random=202",
-                text = "Working on something new...",
-                backgroundColor = "#FF6B6B",
-                viewsCount = 45,
-                expiresAt = currentTime + (18 * 60 * 60 * 1000)
-            ),
-            Story(
-                id = "story_3",
-                userId = "user_3",
-                imageUrl = "https://picsum.photos/300/500?random=203",
-                text = "Leg day! 🔥",
-                viewsCount = 167,
-                expiresAt = currentTime + (22 * 60 * 60 * 1000)
-            )
-        )
-        
-        storyDao.insertStories(sampleStories)
-    }
-    
-    /**
-     * Inicializa toda la base de datos con datos de ejemplo
-     */
-    suspend fun seedDatabase(database: IdatgramDatabase) {
-        seedUsers(database.userDao())
-        seedPosts(database.postDao())
-        seedStories(database.storyDao())
+        follows.forEach { follow ->
+            userDao.followUser(follow)
+        }
     }
 }
